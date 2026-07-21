@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AKO 阿格建筑 · 在线咨询</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --ako-bg: #EBDAB9;
+    --ako-tran: #C3BEB4;
+    --ako-anchor: #231E1C;
+    --ako-accent: #A08C64;
+    --ako-title: #B99B5F;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+  .chat-window {
+    background: var(--ako-bg);
+    border: 2px solid var(--ako-anchor);
+    border-radius: 12px;
+    display: flex; flex-direction: column;
+    height: 100%; max-height: 100%;
+  }
+  .chat-header {
+    background: linear-gradient(135deg, var(--ako-anchor), #3a3330);
+    color: var(--ako-title);
+    padding: 14px 18px;
+    font-weight: 700; font-size: 16px;
+    border-radius: 10px 10px 0 0;
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0;
+  }
+  .ako-logo {
+    font-size: 22px; font-weight: 900; letter-spacing: 2px;
+    color: var(--ako-title);
+  }
+  .ako-triangle {
+    display: inline-block; width: 0; height: 0;
+    border-left: 8px solid var(--ako-bg);
+    border-bottom: 14px solid var(--ako-title);
+    border-right: 8px solid transparent;
+    margin-left: 2px;
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .msg-bot {
+    align-self: flex-start; max-width: 85%;
+    background: var(--ako-tran); color: var(--ako-anchor);
+    padding: 10px 14px; border-radius: 4px 16px 16px 16px;
+    border: 1px solid var(--ako-anchor);
+    font-size: 14px; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .msg-user {
+    align-self: flex-end; max-width: 85%;
+    background: #d9c8a8; color: var(--ako-anchor);
+    padding: 10px 14px; border-radius: 16px 4px 16px 16px;
+    border: 1px solid var(--ako-anchor);
+    font-size: 14px; line-height: 1.6;
+    word-break: break-word;
+  }
+  .bot-ref { color: var(--ako-title); font-weight: 600; }
+  .bot-sources {
+    margin-top: 6px; font-size: 12px; color: var(--ako-accent);
+    cursor: pointer; user-select: none;
+  }
+  .bot-sources-list {
+    display: none; margin-top: 4px; font-size: 12px; color: var(--ako-anchor);
+    opacity: 0.8;
+  }
+  .bot-sources-list.show { display: block; }
+
+  .typing-dots { display: flex; gap: 4px; padding: 8px 0; }
+  .typing-dots span {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--ako-accent);
+    animation: breathe 1.4s infinite ease-in-out both;
+  }
+  .typing-dots span:nth-child(1) { animation-delay: 0s; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes breathe {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  .quick-btns { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 16px 0; flex-shrink: 0; }
+  .quick-btn {
+    background: var(--ako-bg); border: 1px solid var(--ako-anchor);
+    color: var(--ako-anchor); padding: 6px 12px; border-radius: 16px;
+    font-size: 12px; cursor: pointer; transition: 0.2s;
+    white-space: nowrap;
+  }
+  .quick-btn:hover { background: var(--ako-tran); }
+
+  .chat-input-area {
+    padding: 12px 16px; display: flex; gap: 8px;
+    border-top: 1px solid var(--ako-tran); flex-shrink: 0;
+  }
+  .chat-input {
+    flex: 1; padding: 10px 14px; border: 1px solid var(--ako-anchor);
+    border-radius: 20px; background: #faf6ef; color: var(--ako-anchor);
+    font-size: 14px; outline: none;
+  }
+  .chat-input:focus { border-color: var(--ako-accent); }
+  .chat-send {
+    padding: 10px 20px; background: var(--ako-anchor); color: var(--ako-bg);
+    border: none; border-radius: 20px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: 0.2s;
+  }
+  .chat-send:hover { background: #4a3c38; }
+  .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .lead-form {
+    background: #faf6ef; border: 1px solid var(--ako-anchor);
+    border-radius: 12px; padding: 16px; margin-top: 8px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .lead-form input, .lead-form select {
+    padding: 10px 12px; border: 1px solid var(--ako-anchor);
+    border-radius: 8px; background: var(--ako-bg); color: var(--ako-anchor);
+    font-size: 14px;
+  }
+  .lead-submit {
+    padding: 10px; background: var(--ako-accent); color: #fff;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: 0.2s;
+  }
+  .lead-submit:hover { background: #8b7852; }
+
+  .lead-success {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--ako-accent); font-weight: 600; font-size: 14px;
+    padding: 12px;
+  }
+  .lead-success svg { width: 24px; height: 24px; color: var(--ako-accent); }
+
+  .chat-footer {
+    padding: 6px 16px 10px; font-size: 11px; color: var(--ako-accent);
+    text-align: center; flex-shrink: 0;
+  }
+
+  .floating-btn {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--ako-anchor); color: var(--ako-bg);
+    border: 2px solid var(--ako-title); font-size: 24px;
+    cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    z-index: 9999; display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+  }
+  .floating-btn:hover { transform: scale(1.08); }
+
+  .chat-container {
+    position: fixed; bottom: 90px; right: 24px;
+    width: 380px; height: 560px; z-index: 9998;
+    display: none; flex-direction: column;
+  }
+  .chat-container.open { display: flex; }
+
+  @media (max-width: 480px) {
+    .chat-container {
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100%;
+      bottom: 0;
+    }
+    .chat-window { border-radius: 0; border: none; }
+    .chat-header { border-radius: 0; }
+    .floating-btn { bottom: 16px; right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="floating-btn" id="floatingBtn" onclick="toggleChat()" title="在线咨询">💬</div>
+
+<div class="chat-container" id="chatContainer">
+  <div class="chat-window">
+    <!-- Header -->
+    <div class="chat-header">
+      <span class="ako-logo">AKO <span style="font-size:12px;">▼</span></span>
+      <span style="color:var(--ako-bg);">阿格建筑 · 在线咨询</span>
+      <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:var(--ako-bg);font-size:20px;cursor:pointer;">✕</button>
+    </div>
+
+    <!-- Quick Buttons -->
+    <div class="quick-btns" id="quickBtns">
+      <button class="quick-btn" onclick="sendQuick('城市更新能用陶粒墙板吗')">城市更新</button>
+      <button class="quick-btn" onclick="sendQuick('文旅民宿隔音怎么解决')">文旅民宿</button>
+      <button class="quick-btn" onclick="sendQuick('乡村民居造价怎么算')">乡村民居</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg-bot">
+        您好，我是阿格建筑咨询助手 👋<br>可为您解答陶粒墙板产品与应用的疑问，请直接输入问题或点击上方快捷按钮。
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area" id="chatInputArea">
+      <input class="chat-input" id="chatInput" type="text" placeholder="输入您的问题..." onkeydown="if(event.key==='Enter') sendMsg()" />
+      <button class="chat-send" id="sendBtn" onclick="sendMsg()">发送</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="chat-footer" id="chatFooter">
+      知识库更新至 <span id="kbDate">加载中...</span> · 由阿格知识库提供支持
+    </div>
+  </div>
+</div>
+
+<script>
+// ======== 配置（备案域名落地后只改 WALL_API 这一行 + 网关 .env） ========
+var WALL_API = '/wall_api.php';
+var API_BASE = window.AKO_API_BASE || '';
+
+var sessionId = null;
+var isLoading = false;
+var currentBotMsg = null;
+var kbUpdatedAt = '';
+
+// 错误/兜底话术黑名单：wall_api 返回中若含以下任一短语，视为无效结果
+var _ERROR_PATTERNS = [
+  '网络连接异常',
+  '网络异常',
+  '连接失败',
+  '稍后重试',
+  '请稍后再试',
+  '系统繁忙',
+  '服务不可用',
+  '服务器错误',
+  '数据库连接',
+  '接口异常',
+  '请求超时',
+  '找不到数据',
+  '暂无数据',
+];
+
+function _isErrorResponse(text) {
+  if (!text) return false;
+  for (var i = 0; i < _ERROR_PATTERNS.length; i++) {
+    if (text.indexOf(_ERROR_PATTERNS[i]) !== -1) return true;
+  }
+  return false;
+}
+
+// 带超时的 fetch 封装
+function _fetchWithTimeout(url, timeoutMs) {
+  timeoutMs = timeoutMs || 8000;
+  return new Promise(function(resolve, reject) {
+    var timer = setTimeout(function() {
+      reject(new Error('请求超时'));
+    }, timeoutMs);
+    fetch(url).then(function(resp) {
+      clearTimeout(timer);
+      resolve(resp);
+    }).catch(function(err) {
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
+// ======== 结构化问题关键词路由（与网关 R010/R020/R030 口径一致） ========
+var STRUCT_RULES = [
+  { re: /厚度|规格|型号|多厚|尺寸|板幅/, type: 'panels' },
+  { re: /隔声|隔音|耐火|防火|抗风|水密|气密|放射|环保|吊挂|软化|防潮|保温|传热|检测|收缩|冲击|抗弯|抗冻|面密度|含水|配筋|承载力/, type: 'specs' },
+  { re: /价格|报价|多少钱|造价|单价/, type: 'pricing' }
+];
+
+// FAQ 会话级缓存
+var _faqCache = null;
+
+// ======== 轻量级 Markdown→纯文本渲染 ========
+function _stripMarkdown(text) {
+  if (!text) return '';
+  var s = text.replace(/\*\*(.+?)\*\*/g, '$1');
+  s = s.replace(/\*(.+?)\*/g, '$1');
+  s = s.replace(/^#{1,6}\s+/gm, '');
+  s = s.replace(/\[\d+\]/g, '');
+  s = s.replace(/`{1,3}[^`]*`{1,3}/g, '');
+  s = s.replace(/^>\s?/gm, '');
+  s = s.replace(/^[\s]*[-*+]\s+/gm, '');
+  s = s.replace(/^[\s]*\d+\.\s+/gm, '');
+  s = s.replace(/^[-*_]{3,}\s*$/gm, '');
+  s = s.replace(/\n{3,}/g, '\n\n');
+  return s.trim();
+}
+
+function _renderText(text) {
+  try {
+    if (typeof marked !== 'undefined' && marked.parse) {
+      var html = marked.parse(text);
+      if (typeof html === 'string') return html;
+    }
+  } catch(e) {}
+  var safe = _stripMarkdown(text);
+  safe = safe.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+  return safe.replace(/\n/g, '<br>');
+}
+
+// ======== 从问题中提取厚度数字（100~200） ========
+function _extractThickness(text) {
+  var m = text.match(/\b(1[0-9][0-9]|200)\b/);
+  return m ? parseInt(m[0], 10) : 0;
+}
+
+// ======== 规格/参数/报价 → 回答组装函数 ========
+
+function _answerPanels(rows) {
+  // 六档厚度 × 两类（承重墙板/非承重挂板），表格列出
+  var lines = ['阿格陶粒墙板产品规格如下：', ''];
+  lines.push('| 型号 | 类型 | 厚度 | 最大板幅 | 防火等级 |');
+  lines.push('|------|------|------|----------|----------|');
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    lines.push('| ' + r.model_code + ' | ' + r.panel_type + ' | ' + r.thickness_mm + 'mm | ' + r.max_size + ' | ' + r.fire_class + ' |');
+  }
+  lines.push('');
+  lines.push('如有定制需求，可留下联系方式，顾问为您提供一对一方案。');
+  return lines.join('\n');
+}
+
+function _answerSpecs(rows, question) {
+  // 按 question 关键词过滤相关项目后输出，区分实测/呈报/待补口径
+  var kwMap = {
+    '隔声': ['隔声'], '隔音': ['隔声'],
+    '耐火': ['耐火'], '防火': ['耐火'],
+    '抗风': ['抗风'], '水密': ['水密'], '气密': ['气密'],
+    '放射性': ['放射性'], '环保': ['放射性'],
+    '吊挂': ['吊挂'], '软化': ['软化'], '防潮': ['软化'],
+    '保温': ['传热'], '传热': ['传热'],
+    '检测报告': [], '检测': [],
+    '收缩': ['收缩'], '冲击': ['冲击'],
+    '抗弯': ['抗弯'], '承载力': ['抗弯'],
+    '抗冻': ['抗冻'], '面密度': ['面密度'],
+    '含水': ['含水'], '配筋': ['配筋']
+  };
+
+  var matchedKw = [];
+  var keys = Object.keys(kwMap);
+  for (var k = 0; k < keys.length; k++) {
+    var kw = keys[k];
+    if (question.indexOf(kw) !== -1) {
+      var targets = kwMap[kw];
+      if (targets.length) {
+        matchedKw = matchedKw.concat(targets);
+      } else {
+        matchedKw.push(kw);
+      }
+    }
+  }
+
+  // 过滤相关项目
+  var filtered = rows;
+  if (matchedKw.length) {
+    filtered = [];
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var item = r.spec_item || '';
+      for (var j = 0; j < matchedKw.length; j++) {
+        if (item.indexOf(matchedKw[j]) !== -1) {
+          filtered.push(r);
+          break;
+        }
+      }
+    }
+    if (!filtered.length) filtered = rows;
+  }
+
+  // 按状态分离
+  var measured = [], reported = [], pending = [];
+  for (var m = 0; m < filtered.length; m++) {
+    var row = filtered[m];
+    var st = row.data_status || '';
+    if (st === '实测') measured.push(row);
+    else if (st === '呈报') reported.push(row);
+    else if (st === '待补' || st === '待确认') pending.push(row);
+  }
+
+  var lines = [];
+
+  if (measured.length) {
+    lines.push('**实测数据（可出具检测报告）：**');
+    lines.push('');
+    for (var a = 0; a < measured.length; a++) {
+      var mr = measured[a];
+      var line = '- **' + mr.spec_item + '**：' + mr.spec_value;
+      if (mr.unit) line += ' ' + mr.unit;
+      if (mr.report_no) line += '（报告 ' + mr.report_no + '）';
+      lines.push(line);
+    }
+    lines.push('');
+  }
+
+  if (reported.length) {
+    lines.push('**技术说明口径数据：**');
+    lines.push('');
+    for (var b = 0; b < reported.length; b++) {
+      var rr = reported[b];
+      var rline = '- **' + rr.spec_item + '**：' + rr.spec_value;
+      if (rr.unit) rline += ' ' + rr.unit;
+      rline += '（技术说明口径）';
+      lines.push(rline);
+    }
+    lines.push('');
+  }
+
+  if (!lines.length) {
+    lines.push('您查询的参数正在检测或确认中，具体数据陆续上库。');
+    lines.push('');
+    lines.push('如需获取最新检测进度或技术资料，请留下联系方式，顾问为您对接实验室。');
+    return lines.join('\n');
+  }
+
+  if (pending.length) {
+    lines.push('其余厚度参数检测中，陆续上库。');
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
+function _answerPricing(rows) {
+  var loadPrice = null, nonloadPrice = null;
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    var price = r.price_from;
+    if (r.panel_type === '承重墙板' && (loadPrice === null || parseFloat(price) < parseFloat(loadPrice))) {
+      loadPrice = price;
+    }
+    if (r.panel_type === '非承重挂板' && (nonloadPrice === null || parseFloat(price) < parseFloat(nonloadPrice))) {
+      nonloadPrice = price;
+    }
+  }
+
+  var lines = ['**阿格陶粒墙板基础报价（含税出厂）：**', ''];
+  if (loadPrice) {
+    lines.push('- 承重墙板（100-200mm）：**' + loadPrice + ' 元/㎡ 起**');
+    lines.push('  - 适用：主体承重墙、剪力墙位');
+  }
+  if (nonloadPrice) {
+    lines.push('- 非承重挂板（100-200mm）：**' + nonloadPrice + ' 元/㎡ 起**');
+    lines.push('  - 适用：填充墙、幕墙挂板、隔墙');
+  }
+  lines.push('');
+  lines.push('> 以上为基准出厂价，**最终价格按厚度、构造、订单量与项目地报价**，以正式报价单为准。');
+  lines.push('');
+  lines.push('📋 **留下联系方式，顾问出具正式报价单与最优方案。**');
+  return lines.join('\n');
+}
+
+// ======== 结构化直答：浏览器直连 wall_api.php（DB-003） ========
+async function structAnswer(question) {
+  // 1) 关键词命中结构化问题 → 直连 wall_api 取数组装回答
+  var thk = _extractThickness(question);
+  var qtype = null;
+
+  for (var i = 0; i < STRUCT_RULES.length; i++) {
+    if (STRUCT_RULES[i].re.test(question)) {
+      qtype = STRUCT_RULES[i].type;
+      break;
+    }
+  }
+
+  if (!qtype) {
+    // 2) 未命中 → 试 FAQ 匹配
+    return await tryFAQ(question);
+  }
+
+  // 3) 命中 → 直连 wall_api
+  try {
+    var params = '?type=' + qtype;
+    if (thk) params += '&thickness=' + thk;
+
+    var resp = await _fetchWithTimeout(WALL_API + params);
+    if (!resp.ok) return null;
+
+    var data = await resp.json();
+    if (!data.ok || !Array.isArray(data.data) || !data.data.length) return null;
+
+    var answer;
+    if (qtype === 'panels') {
+      answer = _answerPanels(data.data);
+    } else if (qtype === 'specs') {
+      answer = _answerSpecs(data.data, question);
+    } else if (qtype === 'pricing') {
+      answer = _answerPricing(data.data);
+    }
+
+    if (answer && !_isErrorResponse(answer)) {
+      return { text: answer, source: '《阿格墙板数据库》', isLead: qtype === 'pricing' };
+    }
+    if (_isErrorResponse(answer || '')) {
+      console.warn('[AKO] wall_api 返回疑似错误话术，已丢弃: ' + qtype);
+    }
+    if (!answer) {
+      console.warn('[AKO] wall_api 返回空结果: ' + qtype);
+    }
+  } catch(e) {
+    console.warn('[AKO] wall_api 直连失败:', e.message);
+  }
+
+  return null;
+}
+
+// ======== FAQ 匹配（最长公共子串 ≥2 字） ========
+async function tryFAQ(question) {
+  try {
+    if (!_faqCache) {
+      var resp = await _fetchWithTimeout(WALL_API + '?type=faq');
+      if (!resp.ok) return null;
+      var data = await resp.json();
+      if (!data.ok || !Array.isArray(data.data) || !data.data.length) return null;
+      // FAQ 数据格式: [{id, question, answer}, ...]
+      _faqCache = data.data;
+    }
+
+    var best = null, bestLen = 0;
+    for (var i = 0; i < _faqCache.length; i++) {
+      var faq = _faqCache[i];
+      var len = _lcsLen(question, faq.question || '');
+      if (len >= 2 && len > bestLen) {
+        bestLen = len;
+        best = faq;
+      }
+    }
+
+    if (best) {
+      if (_isErrorResponse(best.answer)) {
+        _faqCache = null;  // 清空缓存，下次重新拉取
+        console.warn('[AKO] FAQ 匹配到错误话术，已丢弃: ' + best.answer.substring(0, 30));
+        return null;
+      }
+      return { text: best.answer, source: '《阿格墙板数据库》' };
+    }
+  } catch(e) {
+    console.warn('[AKO] FAQ 匹配失败:', e.message);
+  }
+  return null;
+}
+
+// 最长公共子串长度
+function _lcsLen(a, b) {
+  if (!a || !b) return 0;
+  var maxLen = 0;
+  var m = a.length, n = b.length;
+  var dp = [];
+  for (var i = 0; i <= m; i++) { dp[i] = []; dp[i][0] = 0; }
+  for (var j = 0; j <= n; j++) { dp[0][j] = 0; }
+  for (var i = 1; i <= m; i++) {
+    for (var j = 1; j <= n; j++) {
+      if (a[i-1] === b[j-1]) {
+        dp[i][j] = dp[i-1][j-1] + 1;
+        if (dp[i][j] > maxLen) maxLen = dp[i][j];
+      } else {
+        dp[i][j] = 0;
+      }
+    }
+  }
+  return maxLen;
+}
+
+// ======== 初始化 ========
+async function init() {
+  try {
+    var resp = await fetch(API_BASE + '/health');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var data = await resp.json();
+    if (data.kb_updated_at) {
+      kbUpdatedAt = data.kb_updated_at;
+      document.getElementById('kbDate').textContent = kbUpdatedAt;
+    }
+  } catch(e) {
+    // 网关不可达是正常的（DB-003 去隧道化后网关仅本地演示用）
+    document.getElementById('kbDate').textContent = '在线（墙板数据库直连）';
+  }
+}
+
+function toggleChat() {
+  var c = document.getElementById('chatContainer');
+  var btn = document.getElementById('floatingBtn');
+  if (c.classList.contains('open')) {
+    c.classList.remove('open');
+    btn.style.display = 'flex';
+  } else {
+    c.classList.add('open');
+    btn.style.display = 'none';
+    document.getElementById('chatInput').focus();
+  }
+}
+
+function addMsg(role, html, sources, score) {
+  var msgs = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.className = role === 'user' ? 'msg-user' : 'msg-bot';
+  div.innerHTML = html;
+
+  if (sources && sources.length > 0) {
+    var srcWrap = document.createElement('div');
+    srcWrap.className = 'bot-sources';
+    srcWrap.textContent = '参考来源 ▸';
+    var srcList = document.createElement('div');
+    srcList.className = 'bot-sources-list';
+    srcList.innerHTML = sources.map(function(s, i) {
+      return '<div>[' + (i+1) + '] ' + (s.display_name || s) + ' (相关度: ' + ((s.score||0).toFixed(2)) + ')</div>';
+    }).join('');
+    srcWrap.onclick = function() { srcList.classList.toggle('show'); };
+    div.appendChild(srcWrap);
+    div.appendChild(srcList);
+  }
+
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function addTypingDots() {
+  var msgs = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.className = 'msg-bot';
+  div.id = 'typingDots';
+  div.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function removeTypingDots() {
+  var dots = document.getElementById('typingDots');
+  if (dots) dots.remove();
+}
+
+function addLeadForm() {
+  var msgs = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.className = 'msg-bot';
+  div.innerHTML = '<div style="margin-bottom:10px;">这个问题我为您转接专属顾问，请留下联系方式，稍后第一时间回复您。</div>' +
+    '<div class="lead-form" id="leadForm">' +
+    '<input type="text" id="leadName" placeholder="您的姓名" />' +
+    '<input type="text" id="leadPhone" placeholder="手机号码" />' +
+    '<select id="leadMarket">' +
+    '<option value="">请选择意向市场</option>' +
+    '<option value="城市更新">城市更新</option>' +
+    '<option value="文旅民宿">文旅民宿</option>' +
+    '<option value="乡村民居">乡村民居</option>' +
+    '</select>' +
+    '<button class="lead-submit" onclick="submitLead()">提交咨询</button>' +
+    '</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function submitLead() {
+  var name = document.getElementById('leadName').value.trim();
+  var phone = document.getElementById('leadPhone').value.trim();
+  var market = document.getElementById('leadMarket').value;
+
+  if (!name || !phone || !market) {
+    alert('请填写完整信息');
+    return;
+  }
+
+  try {
+    var resp = await fetch(API_BASE + '/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, phone: phone, market: market, message: '' }),
+    });
+    var data = await resp.json();
+    if (data.ok) {
+      var form = document.getElementById('leadForm');
+      form.innerHTML = '<div class="lead-success">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+        '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>' +
+        '</svg>' +
+        '提交成功，专属顾问将尽快联系您' +
+        '</div>';
+    }
+  } catch(e) {
+    // 网关不可达时留资失败 → 静默兜底
+    var form = document.getElementById('leadForm');
+    form.innerHTML = '<div class="lead-success">' +
+      '您的咨询已记录，客服稍后与您联系。如急需帮助，可拨打客服热线联系我们的服务团队。' +
+      '</div>';
+  }
+}
+
+function sendQuick(q) {
+  document.getElementById('chatInput').value = q;
+  sendMsg();
+}
+
+async function sendMsg() {
+  var input = document.getElementById('chatInput');
+  var question = input.value.trim();
+  if (!question || isLoading) return;
+  isLoading = true;
+  input.value = '';
+  document.getElementById('sendBtn').disabled = true;
+
+  // 显示用户消息
+  addMsg('user', question);
+  // 隐藏快捷按钮
+  document.getElementById('quickBtns').style.display = 'none';
+
+  var dots = addTypingDots();
+
+  try {
+    // ==== 第一优先：结构化直答 / FAQ（DB-003：浏览器直连 wall_api.php） ====
+    var localResult = await structAnswer(question);
+
+    if (localResult) {
+      removeTypingDots();
+      addMsg('bot', _renderText(localResult.text), [{ display_name: localResult.source, score: 1.0 }]);
+      if (localResult.isLead) {
+        addLeadForm();
+      }
+      isLoading = false;
+      document.getElementById('sendBtn').disabled = false;
+      return;
+    }
+
+    // ==== 第二优先：网关 RAG 长文问答 ====
+    removeTypingDots();
+    dots = addTypingDots();  // 重新显示 loading
+
+    var botDiv = null;
+    var fullText = '';
+    var metaReceived = false;
+
+    var resp = await fetch(API_BASE + '/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: question, session_id: sessionId }),
+    });
+
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+    var contentType = resp.headers.get('content-type') || '';
+    if (contentType.indexOf('application/json') !== -1 || contentType.indexOf('text/event-stream') === -1) {
+      var data = await resp.json();
+      removeTypingDots();
+      sessionId = data.session_id;
+
+      if (data.action === 'lead') {
+        addMsg('bot', _renderText(data.answer || ''));
+        addLeadForm();
+      } else {
+        addMsg('bot', _renderText(data.answer || ''));
+      }
+      isLoading = false;
+      document.getElementById('sendBtn').disabled = false;
+      return;
+    }
+
+    // SSE 流式读取
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+
+    while (true) {
+      var result = await reader.read();
+      if (result.done) break;
+
+      buffer += decoder.decode(result.value, { stream: true });
+      var lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        if (line.indexOf('event: ') === 0) continue;
+        if (line.indexOf('data: ') === 0) {
+          var dataStr = line.substring(6).trim();
+          try {
+            var eventData = JSON.parse(dataStr);
+            if (!metaReceived) {
+              metaReceived = true;
+              sessionId = eventData.session_id;
+              removeTypingDots();
+              if (eventData.action === 'degraded') {
+                fullText = '';
+                botDiv = addMsg('bot', '', eventData.sources, eventData.score);
+              } else {
+                botDiv = addMsg('bot', '', eventData.sources, eventData.score);
+              }
+              continue;
+            }
+            if (eventData.content) {
+              fullText += eventData.content;
+              if (botDiv) {
+                botDiv.textContent = fullText;
+                var msgs = document.getElementById('chatMessages');
+                msgs.scrollTop = msgs.scrollHeight;
+              }
+            }
+          } catch(jsonErr) {}
+        }
+      }
+    }
+  } catch(e) {
+    // 网关不可达 → 优雅兜底（DB-003：关网关仍可用）
+    console.error('[AKO] 网关不可达，使用兜底话术:', e.message);
+    removeTypingDots();
+    addMsg('bot', '该问题已记录，请留下联系方式，顾问稍后为您解答。如急需帮助，可拨打客服热线联系我们的服务团队。');
+    addLeadForm();
+  }
+
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('chatInput').focus();
+}
+
+init();
+</script>
+</body>
+</html>

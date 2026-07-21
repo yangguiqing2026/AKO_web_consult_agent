@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pydantic>=2
+pydantic-settings
+chromadb==0.5.20
+httpx
+rank_bm25
+jieba

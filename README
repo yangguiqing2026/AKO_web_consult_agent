@@ -1,0 +1,62 @@
+# AKO 网站咨询系统 (AKO_web_consult)
+
+阿格建筑（AKO）陶粒墙板在线咨询系统——FastAPI 网关 + 前端客服组件。
+
+## 部署现状（2026-07-18）
+
+- **墙板数据库 / wall_api.php / wall.php 展示页**：虚拟主机 `wh-nc6lcdplh894m2oe8v0.my3w.com` 7×24 公网可达（无需隧道、无需网关）
+- **客服窗结构化问答**：浏览器直连 `wall_api.php`，**网关不开也能答**（规格/参数/报价/FAQ）
+- **RAG 长文问答**：本地网关 `uvicorn src.main:app --host 0.0.0.0 --port 7863`（演示用）；正式上云（方案 C）待小程序落地后启动
+- **frp/cpolar 隧道**：全部移除，墙板数据链路对隧道零依赖
+
+## 快速启动
+
+```bash
+# 安装依赖
+pip install -r requirements.txt
+
+# 启动网关（本地演示）
+py -m uvicorn src.main:app --host 0.0.0.0 --port 7863
+
+# 或双击 start.bat
+```
+
+## 项目结构
+
+```
+AKO_web_consult/
+├── src/
+│   ├── main.py              # FastAPI 入口，:7863
+│   ├── config.py             # 全局配置（pydantic-settings + .env）
+│   ├── models.py             # Pydantic v2 数据契约
+│   ├── intent_router.py      # 意图三分：FAQ/留资/闲聊
+│   ├── retriever.py          # 发布集检索 + 加权RRF融合
+│   ├── llm_router.py         # MiniMax→Kimi→Ollama 三级级联
+│   ├── session.py            # 内存会话管理
+│   ├── source_mask.py        # 来源脱敏
+│   ├── lead_card.py          # 留资卡片
+│   ├── logger.py             # Q&A 日志 JSONL
+│   ├── wall_query.py         # wall_api.php 只读客户端（本地演示用）
+│   ├── wall_answer.py        # 结构化回答组装（本地演示用）
+│   └── static/
+│       └── consult_widget.html  # 前端客服组件
+├── tests/
+│   ├── smoke_test.py         # 冒烟测试
+│   └── test_walldb.py        # WallDB 接入验收测试
+├── data/
+│   ├── sensitive_words.txt   # 敏感词列表
+│   ├── source_map.json       # 来源显示名映射
+│   └── leads.jsonl           # 留资记录
+├── docs/                     # 架构白皮书 & 工程提示词
+└── logs/                     # Q&A 日志
+```
+
+## 关键接口
+
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/health` | GET | 健康检查，含 wall_api 状态 |
+| `/` | GET | 返回前端客服组件 HTML |
+| `/api/chat` | POST | 核心问答（SSE 流式 / JSON） |
+| `/api/lead` | POST | 留资提交 |
+| `/api/admin/threshold` | GET/POST | 热调检索阈值 |

@@ -1,3 +1,9 @@
+# ============================================
+# Author: AKO_studio
+# Agent: AKO_web_consult_agent
+# Generated: 2026-07-30
+# ============================================
+#
 """AKO 网站咨询网关 - 意图路由（关键词规则，优先级排序）— DB-002 增强"""
 
 from typing import Literal

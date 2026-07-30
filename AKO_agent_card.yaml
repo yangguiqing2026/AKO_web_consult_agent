@@ -1,0 +1,26 @@
+agent_id: AKO_web_consult_agent
+name: Web咨询 Agent
+version: 0.1.0
+author: AKO_studio
+created_date: '2026-07-30'
+status: dev
+description: 'TODO: 一句话描述功能（不超过50字）'
+capabilities:
+- 'TODO: 能力1'
+- 'TODO: 能力2'
+dependencies:
+- python>=3.9
+interfaces:
+  input: 'TODO: 输入方式'
+  output: 'TODO: 输出方式'
+health_probe:
+  endpoint: /health
+  expected_response: ok
+registry:
+  registry_agent: AKO_registry_agent
+  registered: false
+tags:
+- code
+- marketing
+- support
+- business

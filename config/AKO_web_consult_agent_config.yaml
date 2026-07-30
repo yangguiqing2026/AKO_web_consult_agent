@@ -1,0 +1,15 @@
+# ============================================
+# Author: AKO_studio
+# Agent: AKO_web_consult_agent
+# Configuration File
+# ============================================
+
+agent:
+  id: "AKO_web_consult_agent"
+  name: "Ako Web Consult Agent"
+  log_level: "INFO"
+
+# TODO: Add agent-specific configuration below
+# example:
+#   param1: "value1"
+#   param2: 100

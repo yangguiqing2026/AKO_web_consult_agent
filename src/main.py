@@ -1,3 +1,9 @@
+# ============================================
+# Author: AKO_studio
+# Agent: AKO_web_consult_agent
+# Generated: 2026-07-30
+# ============================================
+#
 """AKO 网站咨询网关 - FastAPI 装配（:7863，单进程 <500MB）"""
 
 import asyncio
@@ -8,9 +14,9 @@ from collections import defaultdict
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, JSONResponse, HTMLResponse, Response
+# [DEPRECATED_GUI] from fastapi import FastAPI, Request
+# [DEPRECATED_GUI] from fastapi.middleware.cors import CORSMiddleware
+# [DEPRECATED_GUI] from fastapi.responses import StreamingResponse, JSONResponse, HTMLResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.config import settings
@@ -149,7 +155,7 @@ async def lifespan(app: FastAPI):
 
 
 # ==== FastAPI 应用 ====
-app = FastAPI(title="AKO 网站咨询网关", version="1.0.0", lifespan=lifespan)
+# [DEPRECATED_GUI] app = FastAPI(title="AKO 网站咨询网关", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://akobuild.cloud", "https://12563zyom2117.vicp.fun"],
@@ -162,7 +168,7 @@ app.add_middleware(RateLimitMiddleware)
 
 # ==== 端点 ====
 
-@app.get("/health")
+# [DEPRECATED_GUI] @app.get("/health")
 async def health():
     """健康检查端点 — DB-002 增强：含 wall_api 状态"""
     wall_status = "disabled"
@@ -183,7 +189,7 @@ async def health():
     }
 
 
-@app.get("/")
+# [DEPRECATED_GUI] @app.get("/")
 async def index():
     """返回前端咨询组件"""
     html_path = os.path.join(
@@ -198,12 +204,12 @@ async def index():
         )
 
 
-@app.post("/api/chat")
+# [DEPRECATED_GUI] @app.post("/api/chat")
 async def api_chat(req: ChatRequest, request: Request):
     """核心问答接口（SSE 流式 or 非流式动作）"""
     # 获取客户端信息
     client_ip = request.client.host if request.client else "unknown"
-    user_agent = request.headers.get("user-agent", "")
+    # [DEPRECATED_GUI] user_agent = request.headers.get("user-agent", "")
 
     # 会话恢复
     session_id, history = session_manager.get_or_create(req.session_id)
@@ -409,14 +415,14 @@ async def api_chat(req: ChatRequest, request: Request):
     )
 
 
-@app.post("/api/lead")
+# [DEPRECATED_GUI] @app.post("/api/lead")
 async def api_lead(lead: LeadRequest):
     """留资提交"""
     save_lead(lead)
     return {"ok": True}
 
 
-@app.get("/api/admin/threshold")
+# [DEPRECATED_GUI] @app.get("/api/admin/threshold")
 async def get_threshold(token: str):
     """读当前阈值"""
     if token != settings.admin_token:
@@ -424,7 +430,7 @@ async def get_threshold(token: str):
     return {"score_threshold": settings.score_threshold}
 
 
-@app.post("/api/admin/threshold")
+# [DEPRECATED_GUI] @app.post("/api/admin/threshold")
 async def set_threshold(token: str, request: Request):
     """热调阈值（免重启）"""
     if token != settings.admin_token:

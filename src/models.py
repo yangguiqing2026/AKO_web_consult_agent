@@ -1,3 +1,9 @@
+# ============================================
+# Author: AKO_studio
+# Agent: AKO_web_consult_agent
+# Generated: 2026-07-30
+# ============================================
+#
 """AKO 网站咨询网关数据模型 - Pydantic v2"""
 
 from typing import Literal, Optional

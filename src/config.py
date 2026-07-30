@@ -1,3 +1,9 @@
+# ============================================
+# Author: AKO_studio
+# Agent: AKO_web_consult_agent
+# Generated: 2026-07-30
+# ============================================
+#
 """AKO 网站咨询网关配置 - pydantic-settings BaseSettings，支持 .env 覆盖"""
 
 from typing import List

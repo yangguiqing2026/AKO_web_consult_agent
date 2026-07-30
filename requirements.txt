@@ -1,5 +1,5 @@
-fastapi
-uvicorn[standard]
+# [REMOVED_GUI] fastapi
+# [REMOVED_GUI] uvicorn[standard]
 pydantic>=2
 pydantic-settings
 chromadb==0.5.20

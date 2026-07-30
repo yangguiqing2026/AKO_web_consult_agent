@@ -17,7 +17,7 @@ from datetime import datetime, timezone, timedelta
 # [DEPRECATED_GUI] from fastapi import FastAPI, Request
 # [DEPRECATED_GUI] from fastapi.middleware.cors import CORSMiddleware
 # [DEPRECATED_GUI] from fastapi.responses import StreamingResponse, JSONResponse, HTMLResponse, Response
-from starlette.middleware.base import BaseHTTPMiddleware
+# [CLEANED_GUI] from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.config import settings
 from src.models import ChatRequest, ChatActionResponse, LeadRequest, SourceItem

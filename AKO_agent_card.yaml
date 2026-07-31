@@ -1,26 +1,41 @@
-agent_id: AKO_web_consult_agent
-name: Web咨询 Agent
-version: 0.1.0
+agent_id: AKO_web_consult
+name: Web Consult Agent
+version: 1.0.0
 author: AKO_studio
 created_date: '2026-07-30'
+updated_date: '2026-07-31'
 status: dev
-description: 'TODO: 一句话描述功能（不超过50字）'
+
+description: >
+  Web咨询Agent：提供AKO产品在线咨询和技术方案推荐服务
+
 capabilities:
-- 'TODO: 能力1'
-- 'TODO: 能力2'
+  - "在线咨询应答"
+  - "技术方案推荐"
+  - "产品信息查询"
+  - "FAQ管理"
+
+category: ['business']
+interface_type: cli
+
 dependencies:
-- python>=3.9
+  - python>=3.9
+
 interfaces:
-  input: 'TODO: 输入方式'
-  output: 'TODO: 输出方式'
+  input: "CLI参数 / 配置文件"
+  output: "结果文件 / 日志"
+
 health_probe:
   endpoint: /health
   expected_response: ok
+
 registry:
   registry_agent: AKO_registry_agent
   registered: false
+
 tags:
-- code
-- marketing
-- support
-- business
+  - "web"
+  - "consult"
+  - "support"
+
+entry_point: main.py

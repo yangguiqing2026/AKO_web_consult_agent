@@ -1,0 +1,74 @@
+{
+  "report_id": "QCR2-20260731-674",
+  "agent_id": "AKO_web_consult",
+  "qc_standard_version": "law_v1.0",
+  "qc_round": 2,
+  "overall_score": 96,
+  "result": "PASS",
+  "phases": [
+    {
+      "phase": "P1_代码规范",
+      "score": 21,
+      "max": 25,
+      "result": "PASS",
+      "issues": [
+        {
+          "item": "H4",
+          "severity": "minor",
+          "description": "存在硬编码绝对路径"
+        }
+      ]
+    },
+    {
+      "phase": "P2_功能完整",
+      "score": 30,
+      "max": 30,
+      "result": "PASS",
+      "issues": []
+    },
+    {
+      "phase": "P3_安全合规",
+      "score": 25,
+      "max": 25,
+      "result": "PASS",
+      "issues": []
+    },
+    {
+      "phase": "P4_品牌文档",
+      "score": 20,
+      "max": 20,
+      "result": "PASS",
+      "issues": []
+    }
+  ],
+  "veto_items": [
+    {
+      "item": "V1",
+      "result": "PASS",
+      "evidence": "无硬编码凭据"
+    },
+    {
+      "item": "V2",
+      "result": "PASS",
+      "evidence": "核心入口可正常运行"
+    },
+    {
+      "item": "V3",
+      "result": "PASS",
+      "evidence": "agent_card.yaml 完整"
+    },
+    {
+      "item": "V4",
+      "result": "PASS",
+      "evidence": "目录名 AKO_web_consult_agent 符合 AKO_xxx_agent 规范"
+    },
+    {
+      "item": "V5",
+      "result": "PASS",
+      "evidence": "无 GUI 框架残留"
+    }
+  ],
+  "blockers": [],
+  "recommendations": [],
+  "timestamp": "2026-07-31T12:41:45+08:00"
+}

@@ -9,7 +9,16 @@ agent:
   name: "Ako Web Consult Agent"
   log_level: "INFO"
 
-# TODO: Add agent-specific configuration below
-# example:
-#   param1: "value1"
-#   param2: 100
+# 知识库配置
+registry:
+  endpoint: "${REGISTRY_ENDPOINT:http://localhost:5024}"
+  sync_interval: 60
+  timeout: 10
+
+health:
+  endpoint: "/health"
+  interval: 30
+
+paths:
+  logs_dir: "logs"
+  output_dir: "output"
